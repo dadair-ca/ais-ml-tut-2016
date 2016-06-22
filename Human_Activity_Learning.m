@@ -25,19 +25,19 @@
 %  Workshop of Ambient Assisted Living (IWAAL 2012). Vitoria-Gasteiz,
 %  Spain. Dec 2012|
 
-%% Load Training Data
+%% (1) Load Training Data
 load rawSensorData_train
 
-%% Display data summary
+%% (2) Display data summary
 plotRawSensorData(total_acc_x_train, total_acc_y_train, ...
     total_acc_z_train,trainActivity,1000)
 
-%% Create Table variable
+%% (3) Create Table variable
 rawSensorDataTrain = table(...
     total_acc_x_train, total_acc_y_train, total_acc_z_train, ...
     body_gyro_x_train, body_gyro_y_train, body_gyro_z_train);
 
-%% Pre-process Training Data: *Feature Extraction*
+%% (4) Pre-process Training Data: *Feature Extraction*
 % Lets start with a simple preprocessing technique. Since the raw sensor 
 % data contain fixed-width sliding windows of 2.56sec (128 readings/window) 
 % lets start with a simple average feature for every 128 points
@@ -45,10 +45,12 @@ rawSensorDataTrain = table(...
 humanActivityData = varfun(@Wmean,rawSensorDataTrain);
 humanActivityData.activity = trainActivity;
 
-%% Train a model and assess its performance using Classification Learner
+%% (5) Train a model and assess its performance using Classification Learner
 classificationLearner
 
-%% Additional Feature Extraction
+%% (6) Additional Feature Extraction
+% Extract potentially more "rich" features from the dataset, such as
+% standard deviations and the first principle component
 
 T_mean = varfun(@Wmean, rawSensorDataTrain);
 T_stdv = varfun(@Wstd,rawSensorDataTrain);
@@ -57,13 +59,17 @@ T_pca  = varfun(@Wpca1,rawSensorDataTrain);
 humanActivityData = [T_mean, T_stdv, T_pca];
 humanActivityData.activity = trainActivity;
 
-%% Use the new features to train a model and assess its performance 
-classificationLearner
+%% (7) Use the new features to train a model and assess its performance 
 
-%% Load Test Data
+classificationLearner
+msgbox('Export one of your trained models to the workspace as "trainedClassifier" when you are done!');
+
+%% (8) Load Test Data
+
+msgbox('Make sure you exported "trainedClassifier" using classificationLearner.');
 load rawSensorData_test
 
-%% Visualize classifier performance on test data
+%% (9) Visualize classifier performance on test data
 %
 % Step 1: Create a table
 rawSensorDataTest = table(...
